@@ -1,8 +1,23 @@
 # -*- coding: utf-8 -*-
 import os
+import threading
 import telebot
 from openai import OpenAI
+from flask import Flask
 
+# --- Сервери хурд барои Render ---
+# То Render фаҳмад, ки бот зинда аст
+app = Flask(__name__)
+
+@app.route('/')
+def home():
+    return "ToshovGPT is alive! 👋"
+
+def run_web():
+    port = int(os.environ.get("PORT", 10000))
+    app.run(host="0.0.0.0", port=port)
+
+# --- БОТ ---
 TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
@@ -57,5 +72,7 @@ def answer(message):
         bot.reply_to(message, "Бубахшед, каме хатогӣ шуд. Лутфан боз як бор нависед!")
 
 if __name__ == "__main__":
+    # Веб-серверро дар паси парда ба кор меандозем
+    threading.Thread(target=run_web, daemon=True).start()
     print("ToshovGPT 24/7 кор мекунад...")
     bot.polling(none_stop=True, skip_pending=True)
