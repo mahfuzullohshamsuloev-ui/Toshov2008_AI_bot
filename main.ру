@@ -76,3 +76,4 @@ if __name__ == "__main__":
     threading.Thread(target=run_web, daemon=True).start()
     print("ToshovGPT 24/7 кор мекунад...")
     bot.polling(none_stop=True, skip_pending=True)
+# ToshovGPT - навсозӣ
