@@ -17,11 +17,10 @@ def run_web():
 
 TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+AGENT_ID = "agent_6b060cadc0b88191b4248dca2b0f3b43"
 
 bot = telebot.TeleBot(TELEGRAM_TOKEN)
 client = OpenAI(api_key=OPENAI_API_KEY)
-
-SYSTEM_PROMPT = "Tu ToshovGPT hasti. Tu dusti mehribon va shogirdi odob hasti. Bo zaboni tojiki gap mezani. Khudro hamesha ToshovGPT muarrifi kun. Hamesha khushmuomila, sodda va garm gap bizan."
 
 user_histories = {}
 MAX_HISTORY = 20
@@ -52,11 +51,16 @@ def answer(message):
         if len(history) > MAX_HISTORY:
             history = history[-MAX_HISTORY:]
             user_histories[user_id] = history
-        response = client.chat.completions.create(
-            model="gpt-6.2-astra",
-            messages=[{"role": "system", "content": SYSTEM_PROMPT}] + history
+
+        # Занг ба Агенти ToshovGPT
+        response = client.responses.create(
+            agent=AGENT_ID,
+            input=history
         )
-        text = response.choices[0].message.content
+        text = response.output_text
+        if not text:
+            text = "Бубахшед, агент ҷавоб надод. Лутфан боз як бор нависед!"
+
         history.append({"role": "assistant", "content": text})
         for i in range(0, len(text), 4000):
             part = text[i:i+4000]
@@ -72,4 +76,4 @@ if __name__ == "__main__":
     threading.Thread(target=run_web, daemon=True).start()
     print("ToshovGPT 24/7 кор мекунад...")
     bot.polling(none_stop=True, skip_pending=True)
-# ToshovGPT - навсозӣ
+# ToshovGPT - бо Агент
